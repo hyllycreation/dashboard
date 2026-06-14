@@ -255,13 +255,13 @@ function renderList(projects) {
     const urlLink = p.url ? `<a href="${escapeAttr(p.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:none;">↗</a>` : "";
     return `
       <tr data-id="${p.id}">
-        <td>${escapeHTML(p.nom)} ${urlLink}</td>
-        <td>${escapeHTML(clientLabel)}</td>
-        <td><span class="status-tag ${p.statut}"><span class="dot dot-${p.statut}"></span>${STATUT_LABELS[p.statut]}</span></td>
-        <td>${escapeHTML(p.responsable || "—")}</td>
-        <td>${montant}</td>
-        <td>${echeance}</td>
-        <td>›</td>
+        <td class="cell-title" data-label="Site">${escapeHTML(p.nom)} ${urlLink}</td>
+        <td data-label="Client">${escapeHTML(clientLabel)}</td>
+        <td data-label="Statut"><span class="status-tag ${p.statut}"><span class="dot dot-${p.statut}"></span>${STATUT_LABELS[p.statut]}</span></td>
+        <td data-label="Responsable">${escapeHTML(p.responsable || "—")}</td>
+        <td data-label="Montant">${montant}</td>
+        <td data-label="Échéance">${echeance}</td>
+        <td class="cell-chevron">›</td>
       </tr>
     `;
   }).join("");
