@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi Projets — Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ ECRAN LOGIN ============ -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">◆</div>
+      <h1>Suivi Projets</h1>
+      <p class="login-sub">Connectez-vous pour accéder au tableau de bord</p>
+      <form id="login-form">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="email" placeholder="vous@exemple.com">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+        <button type="submit" class="btn-primary" id="login-btn">Se connecter</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div id="app" class="app hidden">
+
+    <!-- Header -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="logo">◆</span>
+        <h1>Suivi Projets</h1>
+      </div>
+      <div class="topbar-right">
+        <input type="search" id="search" placeholder="Rechercher un site, un client...">
+        <select id="filter-responsable">
+          <option value="">Tous</option>
+          <option value="France">France</option>
+          <option value="Suisse">Suisse</option>
+        </select>
+        <button class="btn-icon" id="view-toggle" title="Changer de vue">☰ Liste</button>
+        <button class="btn-primary" id="new-project-btn">+ Nouveau site</button>
+        <button class="btn-icon" id="logout-btn" title="Se déconnecter">⏻</button>
+      </div>
+    </header>
+
+    <!-- Stats bar -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Kanban view -->
+    <main id="kanban-view" class="kanban">
+      <div class="kanban-col" data-statut="prospect">
+        <div class="kanban-col-header"><span class="dot dot-prospect"></span>Prospect</div>
+        <div class="kanban-cards" data-statut="prospect"></div>
+      </div>
+      <div class="kanban-col" data-statut="devis_envoye">
+        <div class="kanban-col-header"><span class="dot dot-devis_envoye"></span>Devis envoyé</div>
+        <div class="kanban-cards" data-statut="devis_envoye"></div>
+      </div>
+      <div class="kanban-col" data-statut="en_cours">
+        <div class="kanban-col-header"><span class="dot dot-en_cours"></span>En cours</div>
+        <div class="kanban-cards" data-statut="en_cours"></div>
+      </div>
+      <div class="kanban-col" data-statut="en_revision">
+        <div class="kanban-col-header"><span class="dot dot-en_revision"></span>En révision</div>
+        <div class="kanban-cards" data-statut="en_revision"></div>
+      </div>
+      <div class="kanban-col" data-statut="livre">
+        <div class="kanban-col-header"><span class="dot dot-livre"></span>Livré</div>
+        <div class="kanban-cards" data-statut="livre"></div>
+      </div>
+      <div class="kanban-col" data-statut="vendu">
+        <div class="kanban-col-header"><span class="dot dot-vendu"></span>Vendu</div>
+        <div class="kanban-cards" data-statut="vendu"></div>
+      </div>
+    </main>
+
+    <!-- List view -->
+    <main id="list-view" class="list-view hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Site</th>
+            <th>Client</th>
+            <th>Statut</th>
+            <th>Responsable</th>
+            <th>Montant</th>
+            <th>Échéance</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="list-body"></tbody>
+      </table>
+    </main>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-icon">＋</div>
+      <h2>Aucun site pour l'instant</h2>
+      <p>Ajoutez votre premier site pour commencer le suivi.</p>
+      <button class="btn-primary" id="empty-add-btn">+ Nouveau site</button>
+    </div>
+
+  </div>
+
+  <!-- ============ MODAL PROJET ============ -->
+  <div id="project-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Nouveau site</h2>
+        <button class="btn-icon" id="modal-close">✕</button>
+      </div>
+      <form id="project-form">
+        <input type="hidden" id="project-id">
+
+        <label for="p-nom">Nom du site / domaine *</label>
+        <input type="text" id="p-nom" required placeholder="ex: monclient.fr">
+
+        <div class="form-row">
+          <div class="form-col">
+            <label for="p-client-select">Client</label>
+            <select id="p-client-select">
+              <option value="">— Aucun —</option>
+              <option value="__new__">+ Créer un nouveau client</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label for="p-responsable">Responsable</label>
+            <select id="p-responsable">
+              <option value="">—</option>
+              <option value="France">France</option>
+              <option value="Suisse">Suisse</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Bloc création client -->
+        <div id="new-client-block" class="hidden new-client-block">
+          <label for="c-nom">Nom du client *</label>
+          <input type="text" id="c-nom" placeholder="Jean Dupont">
+          <div class="form-row">
+            <div class="form-col">
+              <label for="c-entreprise">Entreprise</label>
+              <input type="text" id="c-entreprise" placeholder="Dupont SARL">
+            </div>
+            <div class="form-col">
+              <label for="c-email">Email</label>
+              <input type="email" id="c-email" placeholder="contact@..">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label for="p-statut">Statut</label>
+            <select id="p-statut">
+              <option value="prospect">Prospect</option>
+              <option value="devis_envoye">Devis envoyé</option>
+              <option value="en_cours">En cours</option>
+              <option value="en_revision">En révision</option>
+              <option value="livre">Livré</option>
+              <option value="vendu">Vendu</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label for="p-montant">Montant (€/CHF)</label>
+            <input type="number" id="p-montant" step="0.01" placeholder="1500">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label for="p-debut">Date de début</label>
+            <input type="date" id="p-debut">
+          </div>
+          <div class="form-col">
+            <label for="p-echeance">Échéance</label>
+            <input type="date" id="p-echeance">
+          </div>
+        </div>
+
+        <label for="p-url">Lien du site (Netlify / prod)</label>
+        <input type="url" id="p-url" placeholder="https://...">
+
+        <label for="p-notes">Notes</label>
+        <textarea id="p-notes" rows="3" placeholder="Infos utiles, accès, remarques..."></textarea>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-danger hidden" id="delete-project-btn">Supprimer</button>
+          <div class="modal-actions-right">
+            <button type="button" class="btn-secondary" id="cancel-btn">Annuler</button>
+            <button type="submit" class="btn-primary" id="save-btn">Enregistrer</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
