@@ -221,7 +221,7 @@ function renderKanban(projects) {
 
   // Attach drag events + click events
   document.querySelectorAll(".card").forEach(card => {
-    card.addEventListener("click", () => openModal(card.dataset.id));
+    card.addEventListener("click", () => openDetail(card.dataset.id));
     card.addEventListener("dragstart", onDragStart);
     card.addEventListener("dragend", onDragEnd);
   });
@@ -267,7 +267,7 @@ function renderList(projects) {
   }).join("");
 
   tbody.querySelectorAll("tr").forEach(tr => {
-    tr.addEventListener("click", () => openModal(tr.dataset.id));
+    tr.addEventListener("click", () => openDetail(tr.dataset.id));
   });
 }
 
@@ -352,6 +352,89 @@ document.getElementById("view-toggle").addEventListener("click", () => {
 // ============================================
 document.getElementById("search").addEventListener("input", render);
 document.getElementById("filter-responsable").addEventListener("change", render);
+
+// ============================================
+// MODAL DETAIL (lecture seule)
+// ============================================
+const detailModal = document.getElementById("detail-modal");
+let currentDetailId = null;
+
+function detailRow(label, valueHTML) {
+  if (valueHTML === "" || valueHTML == null) return "";
+  return `<div class="detail-row"><dt>${label}</dt><dd>${valueHTML}</dd></div>`;
+}
+
+function openDetail(projectId) {
+  const p = allProjects.find(pr => pr.id === projectId);
+  if (!p) return;
+  currentDetailId = projectId;
+
+  // En-tête
+  document.getElementById("detail-title").textContent = p.nom || "—";
+  const statusEl = document.getElementById("detail-status");
+  statusEl.className = "detail-status status-tag " + p.statut;
+  statusEl.innerHTML = `<span class="dot dot-${p.statut}"></span>${STATUT_LABELS[p.statut] || p.statut}`;
+
+  // Corps
+  const client = p.clients ? (p.clients.entreprise || p.clients.nom) : null;
+  const contact = p.clients && p.clients.entreprise && p.clients.nom && p.clients.entreprise !== p.clients.nom
+    ? p.clients.nom : null;
+  const email = p.clients && p.clients.email ? p.clients.email : null;
+  const tel = p.clients && p.clients.telephone ? p.clients.telephone : null;
+  const montant = p.montant ? Number(p.montant).toLocaleString("fr-FR") + " €/CHF" : null;
+  const debut = p.date_debut ? formatDate(p.date_debut) : null;
+  const echeance = p.date_echeance ? formatDate(p.date_echeance) : null;
+
+  document.getElementById("detail-body").innerHTML =
+    detailRow("Client", client ? escapeHTML(client) : "—") +
+    detailRow("Contact", contact ? escapeHTML(contact) : "") +
+    detailRow("Email", email ? `<a href="mailto:${escapeAttr(email)}">${escapeHTML(email)}</a>` : "") +
+    detailRow("Téléphone", tel ? escapeHTML(tel) : "") +
+    detailRow("Responsable", p.responsable ? escapeHTML(p.responsable) : "—") +
+    detailRow("Montant", montant ? `<span class="detail-amount">${montant}</span>` : "—") +
+    detailRow("Date de début", debut || "—") +
+    detailRow("Échéance", echeance || "—") +
+    detailRow("Lien", p.url ? `<a href="${escapeAttr(p.url)}" target="_blank" rel="noopener">${escapeHTML(p.url)}</a>` : "—") +
+    detailRow("Notes", p.notes ? escapeHTML(p.notes).replace(/\n/g, "<br>") : "—");
+
+  // Bouton "Ouvrir le site"
+  const openBtn = document.getElementById("detail-open");
+  if (p.url) {
+    openBtn.href = p.url;
+    openBtn.classList.remove("hidden");
+  } else {
+    openBtn.classList.add("hidden");
+  }
+
+  detailModal.classList.remove("hidden");
+}
+
+function closeDetail() {
+  detailModal.classList.add("hidden");
+  currentDetailId = null;
+}
+
+document.getElementById("detail-close").addEventListener("click", closeDetail);
+detailModal.addEventListener("click", (e) => { if (e.target === detailModal) closeDetail(); });
+
+document.getElementById("detail-edit").addEventListener("click", () => {
+  const id = currentDetailId;
+  closeDetail();
+  openModal(id);
+});
+
+document.getElementById("detail-delete").addEventListener("click", async () => {
+  const id = currentDetailId;
+  if (!id) return;
+  if (!confirm("Supprimer ce site définitivement ?")) return;
+
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) return showToast("Erreur: " + error.message, "error");
+
+  closeDetail();
+  await loadAll();
+  showToast("Site supprimé.", "success");
+});
 
 // ============================================
 // MODAL PROJET
