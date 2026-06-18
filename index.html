@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Suivi Projets — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +14,13 @@
   <!-- ============ ECRAN LOGIN ============ -->
   <div id="login-screen" class="login-screen">
     <div class="login-card">
-      <div class="login-logo">◆</div>
+      <div class="login-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <h1>Suivi Projets</h1>
       <p class="login-sub">Connectez-vous pour accéder au tableau de bord</p>
       <form id="login-form">
@@ -31,24 +40,56 @@
     <!-- Header -->
     <header class="topbar">
       <div class="topbar-left">
-        <span class="logo">◆</span>
+        <div class="logo-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <h1>Suivi Projets</h1>
       </div>
+
+      <div class="search-wrap">
+        <svg class="search-ico" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+          <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="search" placeholder="Rechercher un site, un client…">
+      </div>
+
       <div class="topbar-right">
-        <input type="search" id="search" placeholder="Rechercher un site, un client...">
-        <select id="filter-responsable">
-          <option value="">Tous</option>
-          <option value="France">France</option>
-          <option value="Suisse">Suisse</option>
-        </select>
-        <button class="btn-icon" id="view-toggle" title="Changer de vue">☰ Liste</button>
-        <button class="btn-primary" id="new-project-btn">+ Nouveau site</button>
-        <button class="btn-icon" id="logout-btn" title="Se déconnecter">⏻</button>
+        <button class="btn-primary" id="new-project-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          Nouveau site
+        </button>
+        <button class="btn-icon btn-icon--logout" id="logout-btn" title="Se déconnecter">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </header>
 
     <!-- Stats bar -->
     <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Toolbar : filtre équipe + bascule de vue -->
+    <div class="toolbar">
+      <div class="toolbar-filter">
+        <label for="filter-responsable">Équipe</label>
+        <select id="filter-responsable">
+          <option value="">Toutes</option>
+          <option value="France">France</option>
+          <option value="Suisse">Suisse</option>
+        </select>
+      </div>
+      <button class="btn-icon" id="view-toggle" title="Changer de vue">☰ Liste</button>
+    </div>
 
     <!-- Kanban view -->
     <main id="kanban-view" class="kanban">
@@ -83,13 +124,7 @@
       <table>
         <thead>
           <tr>
-            <th>Site</th>
-            <th>Client</th>
-            <th>Statut</th>
-            <th>Responsable</th>
-            <th>Montant</th>
-            <th>Échéance</th>
-            <th></th>
+            <th>Site</th><th>Client</th><th>Statut</th><th>Responsable</th><th>Montant</th><th>Échéance</th><th></th>
           </tr>
         </thead>
         <tbody id="list-body"></tbody>
@@ -98,7 +133,14 @@
 
     <!-- Empty state -->
     <div id="empty-state" class="empty-state hidden">
-      <div class="empty-icon">＋</div>
+      <div class="empty-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
       <h2>Aucun site pour l'instant</h2>
       <p>Ajoutez votre premier site pour commencer le suivi.</p>
       <button class="btn-primary" id="empty-add-btn">+ Nouveau site</button>
@@ -106,12 +148,56 @@
 
   </div>
 
+  <!-- ============ MODAL DETAIL (lecture seule) ============ -->
+  <div id="detail-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="detail-head">
+          <span class="detail-status" id="detail-status"></span>
+          <h2 id="detail-title">Site</h2>
+        </div>
+        <button class="btn-icon" id="detail-close" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <dl class="detail-body" id="detail-body"></dl>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" id="detail-delete">Supprimer</button>
+        <div class="modal-actions-right">
+          <a class="btn-secondary hidden" id="detail-open" href="#" target="_blank" rel="noopener">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Ouvrir le site
+          </a>
+          <button type="button" class="btn-primary" id="detail-edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Modifier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ MODAL PROJET ============ -->
   <div id="project-modal" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-header">
         <h2 id="modal-title">Nouveau site</h2>
-        <button class="btn-icon" id="modal-close">✕</button>
+        <button class="btn-icon" id="modal-close" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
       <form id="project-form">
         <input type="hidden" id="project-id">
@@ -137,7 +223,6 @@
           </div>
         </div>
 
-        <!-- Bloc création client -->
         <div id="new-client-block" class="hidden new-client-block">
           <label for="c-nom">Nom du client *</label>
           <input type="text" id="c-nom" placeholder="Jean Dupont">
